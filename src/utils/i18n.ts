@@ -16,7 +16,7 @@ const resources = {
             invalid_compression_type:
                 'Unknown compression type provided. Only `none`, `gzip`, or `brotli` are allowed. Please check the action YAML configuration.',
             invalid_package_name: "The 'name' field is missing in the package.json file. (file location: ",
-            empty_title: '### 🔍 No files have been changed',
+            empty_title: '### 🔍 No files with size changes detected.',
             empty_latest_commit: 'Latest commit:',
             empty_check_commit: 'Please check your commit.',
             package_file: 'File',

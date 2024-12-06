@@ -1,0 +1,6 @@
+{
+    "extends": "@naverpay/eslint-config/typescript",
+    "rules": {
+        "no-console": "off",
+    },
+}

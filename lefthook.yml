@@ -1,0 +1,9 @@
+pre-commit:
+    parallel: true
+    commands:
+      lint:
+            run: npx lint-staged
+commit-msg:
+    scripts:
+        'commithelper.sh':
+            runner: bash

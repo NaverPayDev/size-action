@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "ncc build src/index.ts -t",
+        "build": "ncc build src/index.ts -t --minify",
         "clean": "rm -rf dist",
         "lint": "eslint '**/*.{js,jsx,ts,tsx}'",
         "lint:fix": "pnpm run lint --fix",

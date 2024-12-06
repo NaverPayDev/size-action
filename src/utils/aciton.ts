@@ -54,7 +54,7 @@ export async function createOrUpdatePRComment(pullNumber: number, commentBody: s
     const {data: comments} = await octokit.rest.issues.listComments(commonParams)
     const prevComment = comments.find((comment) => comment?.body && comment.body.includes(SIZE_ACTION_CHECKSUM))
 
-    const checksumComment = `<sub>powered by: <a href="https://oss.fin.navercorp.com/common-fe/size-action/blob/main/${i18nText(
+    const checksumComment = `<sub>powered by: <a href="https://github.com/NaverPayDev/size-action/blob/main/${i18nText(
         'readme',
     )}">${SIZE_ACTION_CHECKSUM}</a></sub>`
 

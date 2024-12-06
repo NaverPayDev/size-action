@@ -1,0 +1,35 @@
+name: "@naverpay/size-action"
+description: "A custom GitHub Action to compare the bundle sizes of packages and Next.js projects."
+author: "2-one-week"
+runs:
+  using: "node16"
+  main: "dist/index.js"
+inputs:
+  github_token:
+    description: "GitHub token. If needed, please use the user's Personal Access Token (PAT)."
+    required: true
+  build_script:
+    description: "The npm script to run for building the project."
+    default: "build"
+  compression:
+    description: "Compression method for file size comparison. Choose one of the following: 'none', 'gzip', or 'brotli'."
+    default: "gzip"
+  show_total:
+    description: "Whether to show the total size and its difference."
+    default: "true"
+  collapse_unchanged:
+    description: "Whether to collapse unchanged files into a separate table."
+    default: "true"
+  omit_unchanged:
+    description: "Whether to exclude unchanged files from the sizes table entirely."
+    default: "false"
+  minimum_change_threshold:
+    description: "Files with changes below this threshold will be considered unchanged. Specify in bytes. (default to 10 for packages, default 1000 for nextjs)"
+  ignore_patterns:
+    description: "File glob patterns to ignore changes in markdown and file sizes."  
+  language:
+    description: "The language for comment generation. Choose either 'en' (English) or 'ko' (Korean)."
+    required: false
+    default: "en"
+  cwd:
+    description: "The working directory to execute the action, relative to the repository root. Defaults to the root directory."

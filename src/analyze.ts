@@ -25,6 +25,10 @@ interface AnalyzeParams {
 export async function analyze({workingDirectory, gitUrl, branch}: AnalyzeParams) {
     try {
         /**
+         * 0. Clean Current Working Directory
+         */
+        await exec(`rm -rf ${workingDirectory}`).catch(() => {})
+        /**
          * 1. Clone Target Branch Repository
          */
         console.log(`Cloning Repository (branch: ${branch})`)
@@ -94,11 +98,8 @@ export async function analyze({workingDirectory, gitUrl, branch}: AnalyzeParams)
                         return [fileName.replace(packageJSONPath, ''), fileSize] as [string, number]
                     }),
                 )
-                const size = sum(sizeOfFiles.map(([, fileSize]) => fileSize))
-                if (size > 0) {
-                    packageJsons.push([name, packageJSON])
-                    packageSizes.push([name, Object.fromEntries(sizeOfFiles)])
-                }
+                packageJsons.push([name, packageJSON])
+                packageSizes.push([name, Object.fromEntries(sizeOfFiles)])
                 continue
             }
         }

@@ -54,7 +54,10 @@ function iconForDifference(delta: number, originalSize: number): string {
 }
 
 function getStatusText(diff: Diff) {
-    const {before, after} = diff
+    const {before, after, delta} = diff
+    if (delta === 0) {
+        return i18nText('status_unchanged')
+    }
     if (before === 0) {
         return i18nText('status_added')
     }
@@ -150,7 +153,7 @@ function diffTable(
             '<summary>',
             'ℹ️ ',
             '<strong>',
-            `${isPackages ? i18nText('view_unchanged_package') : i18nText('view_unchanged_next')}`,
+            `${isPackages ? i18nText('view_unchanged_package_files') : i18nText('view_unchanged_next')}`,
             '</strong>',
             '</summary>',
             '\n\n',

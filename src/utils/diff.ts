@@ -37,16 +37,16 @@ export function getPackagesDiff(
     const diffs: [string, Diff[]][] = []
 
     for (const pkg of packages) {
-        const pkgDiff = getDiff(sizesBefore[pkg], sizesAfter[pkg])
+        const pkgDiff = getDiff(sizesBefore?.[pkg] || {}, sizesAfter?.[pkg] || {})
         const totalDiff = sum(pkgDiff.map(({delta}) => delta))
         // 변경 사항이 총 10B 이하면, 무시
-        if (totalDiff < 10) {
+        if (Math.abs(totalDiff) < 10) {
             continue
         }
         diffs.push([pkg, pkgDiff])
     }
 
-    return diffs
+    return Object.fromEntries(diffs)
 }
 
 export function getNextJSDiff(
@@ -59,10 +59,10 @@ export function getNextJSDiff(
     const diffs: [string, Diff[]][] = []
 
     for (const application of applications) {
-        const applicationDiff = getDiff(sizesBefore[application], sizesAfter[application])
+        const applicationDiff = getDiff(sizesBefore?.[application] || {}, sizesAfter?.[application] || {})
         const totalDiff = sum(applicationDiff.map(({delta}) => delta))
         // 변경 사항이 총 10B 이하면, 무시
-        if (totalDiff < 10) {
+        if (Math.abs(totalDiff) < 10) {
             continue
         }
         diffs.push([application, applicationDiff])
@@ -118,8 +118,11 @@ async function getPackageJSONDependenciesDiff(basePackageJSON: any, headPackageJ
             continue
         }
 
-        if (!baseVersion) {
-            const size = await getPackageUnpackSize(pkg, headVersion)
+        const baseMinVersion = semver.minVersion(baseVersion)
+        const headMinVersion = semver.minVersion(headVersion)
+
+        if (!baseVersion && headMinVersion) {
+            const size = await getPackageUnpackSize(pkg, headMinVersion.version)
             const addedSize = `\`${prettyBytes(size)}\``
             diffs.push({
                 package: pkg,
@@ -130,9 +133,6 @@ async function getPackageJSONDependenciesDiff(basePackageJSON: any, headPackageJ
             })
             continue
         }
-
-        const baseMinVersion = semver.minVersion(baseVersion)
-        const headMinVersion = semver.minVersion(headVersion)
 
         if (!baseMinVersion || !headMinVersion || semver.eq(baseMinVersion, headMinVersion)) {
             continue
@@ -146,8 +146,8 @@ async function getPackageJSONDependenciesDiff(basePackageJSON: any, headPackageJ
         }
 
         const [basePkgSize, headPkgSize] = await Promise.all([
-            getPackageUnpackSize(pkg, baseVersion),
-            getPackageUnpackSize(pkg, headVersion),
+            getPackageUnpackSize(pkg, baseMinVersion.version),
+            getPackageUnpackSize(pkg, headMinVersion.version),
         ])
 
         const delta = headPkgSize - basePkgSize
@@ -166,7 +166,11 @@ async function getPackageJSONDependenciesDiff(basePackageJSON: any, headPackageJ
 
     for (const [pkg, baseVersion] of Object.entries(baseDependencies)) {
         if (!baseVersion.includes('workspace') && !headDependencies?.[pkg]) {
-            const size = await getPackageUnpackSize(pkg, baseVersion)
+            const baseMinVersion = semver.minVersion(baseVersion)
+            if (!baseMinVersion) {
+                continue
+            }
+            const size = await getPackageUnpackSize(pkg, baseMinVersion.version)
             const removedSize = `\`-${prettyBytes(size)}\``
             diffs.push({
                 package: pkg,

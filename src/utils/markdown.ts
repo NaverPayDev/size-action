@@ -178,7 +178,7 @@ function diffTable(
 
 export function getMarkdownContent(
     nextDiffs: [string, Diff[]][],
-    packageDiffs: [string, Diff[]][],
+    packageDiffs: Record<string, Diff[]>,
     packageDependenciesDiff: Record<string, DependencyChange[]>,
 ) {
     const markdownCommonOptions = {
@@ -211,37 +211,51 @@ export function getMarkdownContent(
         markdownContent.push([`### 📄 ${name} <sub>(nextjs static files diff)</sub>`, markdown].join('\n'))
     }
 
-    for (let i = 0; i < packageDiffs.length; i++) {
+    const packageKeys = [...Object.keys(packageDiffs), ...Object.keys(packageDependenciesDiff)]
+    const packageNames = packageKeys.filter((item, index) => packageKeys.indexOf(item) === index)
+
+    for (let i = 0; i < packageNames.length; i++) {
+        const packageName = packageNames[i]
+
         if (i === 0) {
             markdownContent.push('## NPM Packages\n\n')
         }
-        const [name, diffContents] = packageDiffs[i]
-        const markdown = diffTable(diffContents, {
-            ...markdownCommonOptions,
-            minimumChangeThreshold: toNumber(getStringInput('minimum_change_threshold') || 10),
-            isPackages: true,
-        })
-        markdownContent.push([`### 📦 ${name}`, markdown].join('\n'))
 
-        if (packageDependenciesDiff?.[name]) {
-            const dependenciesChanges = packageDependenciesDiff[name]
+        if (packageDiffs?.[packageName]) {
+            const diffContent = packageDiffs[packageName]
+            if (diffContent.length === 0) {
+                continue
+            }
+            const markdown = diffTable(diffContent, {
+                ...markdownCommonOptions,
+                minimumChangeThreshold: toNumber(getStringInput('minimum_change_threshold') || 10),
+                isPackages: true,
+            })
+            markdownContent.push([`### 📦 ${packageName}`, markdown].join('\n'))
+        }
+
+        if (packageDependenciesDiff?.[packageName]) {
+            const dependenciesChanges = packageDependenciesDiff[packageName]
             if (dependenciesChanges.length === 0) {
                 continue
             }
             const rows = dependenciesChanges.map(
                 ({package: pkg, type, previous, updated, bundleSizeText, diffText}) => {
-                    const pkgName = `[\`${pkg}@${updated}\`](https://bundlephobia.com/package/${pkg}@${updated})`
+                    const pkgName = `[\`${pkg}@${updated || previous}\`](https://bundlephobia.com/package/${pkg}@${updated})`
                     return [
                         pkgName,
                         `\`${i18nText(type)}\``,
-                        `\`${previous || `-`}\``,
-                        `\`${updated || `-`}\``,
+                        `\`${previous || '-'}\``,
+                        `\`${updated || '-'}\``,
                         bundleSizeText,
                         diffText,
                     ]
                 },
             )
             const table = createMarkdownTable(dependenciesChangeHeader, rows)
+            if (!packageDiffs?.[packageName]) {
+                markdownContent.push(`### 📦 ${packageName}\n`)
+            }
             markdownContent.push(['#### 🧩 Dependency Changes', table].join('\n\n'))
         }
     }

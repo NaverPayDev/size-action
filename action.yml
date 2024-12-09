@@ -26,7 +26,9 @@ inputs:
   minimum_change_threshold:
     description: "Files with changes below this threshold will be considered unchanged. Specify in bytes. (default to 10 for packages, default 1000 for nextjs)"
   ignore_patterns:
-    description: "File glob patterns to ignore changes in markdown and file sizes."  
+    description: "File glob patterns to ignore changes in markdown and file sizes."
+  ignore_branches:
+    description: "Glob patterns of head branches where the size action will not be executed"
   language:
     description: "The language for comment generation. Choose either 'en' (English) or 'ko' (Korean)."
     required: false

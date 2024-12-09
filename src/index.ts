@@ -1,5 +1,7 @@
 import * as path from 'node:path'
 
+import * as m from 'minimatch'
+
 import {analyze} from './analyze'
 import {
     createOrUpdatePRComment,
@@ -32,8 +34,24 @@ async function main() {
         return
     }
 
-    // TODO: merge 여부나, mergeable 여부 확인이 필요한지?
-    const {state, number: pullNumber /* merged, mergeable, mergeable_state */} = pullRequest
+    const {
+        state,
+        number: pullNumber,
+        base: {
+            ref: baseBranch,
+            repo: {clone_url: gitUrl},
+        },
+        head: {ref: headBranch},
+    } = pullRequest
+
+    const ignoreBranches = getStringInput('ignore_branches')
+    if (ignoreBranches) {
+        const isIgnored = m.minimatch(headBranch, ignoreBranches)
+        if (isIgnored) {
+            console.log(i18nText('is_ignored_branches'))
+            return
+        }
+    }
 
     if (state === 'closed') {
         setActionFailed(i18nText('closed_pull_request'))
@@ -48,18 +66,11 @@ async function main() {
     }
 
     startGroup('Install and Build in Parallel')
-    const {
-        base: {
-            ref: baseBranch,
-            repo: {clone_url: gitUrl},
-        },
-        head: {ref: headBranch},
-    } = pullRequest
 
     try {
         const [
-            {packages: basePackages, next: baseNextJS, packageJSONs: basePackageJSONs},
-            {packages: headPackages, next: headNextJS, packageJSONs: headPackageJSONs},
+            {packages: basePackages = {}, next: baseNextJS = {}, packageJSONs: basePackageJSONs = {}},
+            {packages: headPackages = {}, next: headNextJS = {}, packageJSONs: headPackageJSONs = {}},
         ] = await Promise.all([
             analyze({workingDirectory: path.join(process.cwd(), '.base'), gitUrl, branch: baseBranch}),
             analyze({workingDirectory: path.join(process.cwd(), '.head'), gitUrl, branch: headBranch}),

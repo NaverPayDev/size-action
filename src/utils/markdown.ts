@@ -214,10 +214,14 @@ export function getMarkdownContent(
     const packageKeys = [...Object.keys(packageDiffs), ...Object.keys(packageDependenciesDiff)]
     const packageNames = packageKeys.filter((item, index) => packageKeys.indexOf(item) === index)
 
-    for (let i = 0; i < packageNames.length; i++) {
-        const packageName = packageNames[i]
+    let hasTitle = false
 
-        if (i === 0) {
+    for (const packageName of packageNames) {
+        if (
+            (packageDiffs?.[packageName]?.length > 0 || packageDependenciesDiff?.[packageName]?.length > 0) &&
+            !hasTitle
+        ) {
+            hasTitle = true
             markdownContent.push('## NPM Packages\n\n')
         }
 

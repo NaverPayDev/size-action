@@ -29,8 +29,7 @@
         "i18next": "^24.0.2",
         "minimatch": "^10.0.1",
         "pretty-bytes": "^6.1.1",
-        "semver": "^7.6.3",
-        "size-plugin-core": "^0.0.9"
+        "semver": "^7.6.3"
     },
     "devDependencies": {
         "@naverpay/commit-helper": "^1.1.0",

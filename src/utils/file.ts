@@ -140,7 +140,7 @@ export function getPackageFiles(packageJSONPath: string, packageJSON: any) {
                 : path.join(packageJSONPath, file, '**', '*')
             return glob
                 .globSync(pattern, {nodir: true})
-                .filter((fileName) => ['.js', '.cjs', '.mjs'].some((extension) => fileName.endsWith(extension)))
+                .filter((fileName) => ['.js', '.cjs', '.mjs', '.png'].some((extension) => fileName.endsWith(extension)))
         })
         .flat()
 }

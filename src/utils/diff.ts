@@ -159,8 +159,8 @@ async function getPackageJSONDependenciesDiff(basePackageJSON: any, headPackageJ
             type: changeType === 'downgrade' ? 'package_downgrade' : 'package_updated',
             previous: baseVersion,
             updated: headVersion,
-            bundleSizeText: `\`${prettyBytes(basePkgSize)}\` → \`${prettyBytes(headPkgSize)}\``,
-            diffText: `\`${prettyBytes(Math.round(delta))}${percentageText}\``,
+            bundleSizeText: `\`${basePkgSize > 0 ? '+' : ''}${prettyBytes(basePkgSize)}\` → \`${basePkgSize > 0 ? '+' : ''}${prettyBytes(headPkgSize)}\``,
+            diffText: `\`${delta > 0 ? '+' : ''}${prettyBytes(Math.round(delta))}${percentageText}\``,
         })
     }
 

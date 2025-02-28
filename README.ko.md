@@ -54,7 +54,7 @@
        runs-on: ubuntu-latest
        steps:
          - name: 사이즈 액션 실행
-           uses: naverpay/size-action@v1
+           uses: naverpay/size-action@main
            with:
              github_token: ${{ secrets.GITHUB_TOKEN }}
              build_script: build

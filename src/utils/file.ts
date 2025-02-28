@@ -71,12 +71,15 @@ export async function getFileSize(filePath: string) {
 }
 
 export function getPackageJSONs(workingDirectory: string): [string, any][] {
-    return glob.globSync('**/package.json', {cwd: workingDirectory}).map((filePath) => {
-        const jsonPath = path.join(workingDirectory, filePath)
-        const packagePath = jsonPath.replace(/\/package.json$/, '')
-        const content = JSON.parse(fs.readFileSync(jsonPath, {encoding: 'utf-8'}))
-        return [packagePath, content]
-    })
+    return glob
+        .globSync('**/package.json', {cwd: workingDirectory})
+        .filter((filePath) => !filePath.startsWith('node_modules'))
+        .map((filePath) => {
+            const jsonPath = path.join(workingDirectory, filePath)
+            const packagePath = jsonPath.replace(/\/package.json$/, '')
+            const content = JSON.parse(fs.readFileSync(jsonPath, {encoding: 'utf-8'}))
+            return [packagePath, content]
+        })
 }
 
 export async function isNextJSApplication(packageJSONPath: string, packageJSON: any) {

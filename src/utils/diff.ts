@@ -114,7 +114,9 @@ async function getPackageJSONDependenciesDiff(basePackageJSON: any, headPackageJ
     for await (const [pkg, headVersion] of Object.entries(headDependencies)) {
         const baseVersion = baseDependencies[pkg] || ''
 
-        if (headVersion.includes('workspace') || baseVersion.includes('workspace')) {
+        const isWorkspace = headVersion.includes('workspace') || baseVersion.includes('workspace')
+        const isCatalog = headVersion.includes('catalog') || baseVersion.includes('catalog')
+        if (isWorkspace || isCatalog) {
             continue
         }
 
